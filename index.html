@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Pulsera GPS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Importa los módulos necesarios de Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB52WZLWDnO1oN2_CudtqYW-u84zFk81nE",
+      authDomain: "pulseragps-12e07.firebaseapp.com",
+      databaseURL: "https://pulseragps-12e07-default-rtdb.firebaseio.com",
+      projectId: "pulseragps-12e07",
+      storageBucket: "pulseragps-12e07.appspot.com",
+      messagingSenderId: "949047709552",
+      appId: "1:949047709552:web:bb4ba0e6e2b1bd504d49b5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    const map = L.map('map').setView([19.833380, -98.949455], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    const marker = L.marker([19.833380, -98.949455]).addTo(map);
+
+    const gpsRef = ref(database, 'pulsera1');
+
+    onValue(gpsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data && data.lat && data.lng) {
+        const lat = data.lat;
+        const lng = data.lng;
+        marker.setLatLng([lat, lng]);
+        map.panTo([lat, lng]);
+      }
+    });
+  </script>
+</body>
+</html>
