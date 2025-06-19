@@ -42,18 +42,24 @@
       attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    const marker = L.marker([19.833380, -98.949455]).addTo(map);
+    // Lista de pulseras a rastrear
+    const pulseras = ['pulsera1', 'pulserak'];
+    const marcadores = {};
 
-    const gpsRef = ref(database, 'pulsera1');
+    pulseras.forEach((id, index) => {
+      const refPulsera = ref(database, id);
+      const marker = L.marker([19.833380 + 0.0005 * index, -98.949455]).addTo(map).bindPopup(id);
+      marcadores[id] = marker;
 
-    onValue(gpsRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data && data.lat && data.lng) {
-        const lat = data.lat;
-        const lng = data.lng;
-        marker.setLatLng([lat, lng]);
-        map.panTo([lat, lng]);
-      }
+      onValue(refPulsera, (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.lat && data.lng) {
+          const lat = data.lat;
+          const lng = data.lng;
+          marker.setLatLng([lat, lng]);
+          if (index === 0) map.panTo([lat, lng]); // solo centramos en la primera pulsera
+        }
+      });
     });
   </script>
 </body>
